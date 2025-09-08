@@ -19,6 +19,7 @@
     "convex": "^1.26.2"
   },
   "devDependencies": {
+    "@types/node": "^20.19.9",
     "@workspace/typescript-config": "workspace:*",
     "typescript": "latest"
   }
