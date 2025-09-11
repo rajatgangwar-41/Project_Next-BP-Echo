@@ -16,6 +16,7 @@
     }
   },
   "dependencies": {
+    "@clerk/backend": "^2.13.0",
     "convex": "^1.26.2"
   },
   "devDependencies": {
