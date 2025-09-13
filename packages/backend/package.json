@@ -16,8 +16,12 @@
     }
   },
   "dependencies": {
+    "@ai-sdk/google": "^2.0.14",
     "@clerk/backend": "^2.13.0",
-    "convex": "^1.26.2"
+    "@convex-dev/agent": "^0.2.7",
+    "ai": "^5.0.44",
+    "convex": "^1.26.2",
+    "convex-helpers": "^0.1.104"
   },
   "devDependencies": {
     "@types/node": "^20.19.9",
