@@ -14,6 +14,7 @@ import {
   screenAtom,
 } from "../../atoms/widget-atoms";
 import { api } from "@workspace/backend/_generated/api";
+import { WidgetFooter } from "../components/widget-footer";
 
 export const WidgetSelectionScreen = () => {
   const [isPending, setIsPending] = React.useState<boolean>(false);
@@ -79,6 +80,7 @@ export const WidgetSelectionScreen = () => {
           <ChevronRightIcon />
         </Button>
       </div>
+      <WidgetFooter />
     </>
   );
 };
