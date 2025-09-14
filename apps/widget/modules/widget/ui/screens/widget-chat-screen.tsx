@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useAction, useQuery } from "convex/react";
 import { toUIMessages, useThreadMessages } from "@convex-dev/agent/react";
-
 import { ArrowLeftIcon, MenuIcon } from "lucide-react";
 import {
   contactSessionIdAtomFamily,
@@ -34,6 +33,9 @@ import {
   PromptInputTools,
 } from "@workspace/ui/components/ai-elements/prompt-input";
 import { Form, FormField } from "@workspace/ui/components/form";
+import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
+import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
+import { InfiniteScrollTrigger } from "@workspace/ui/components/infinite-scroll-trigger";
 
 const formSchema = z.object({
   message: z.string().min(1, "Message is required"),
@@ -68,6 +70,13 @@ export const WidgetChatScreen = () => {
       : "skip",
     { initialNumItems: 10 },
   );
+
+  const { topElementRef, handleLoadMore, canLoadMore, isLoadingMore } =
+    useInfiniteScroll({
+      status: messages?.status,
+      loadMore: messages?.loadMore,
+      loadSize: 10,
+    });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -111,6 +120,12 @@ export const WidgetChatScreen = () => {
       </WidgetHeader>
       <Conversation>
         <ConversationContent>
+          <InfiniteScrollTrigger
+            canLoadMore={canLoadMore}
+            isLoadingMore={isLoadingMore}
+            onLoadMore={handleLoadMore}
+            ref={topElementRef}
+          />
           {toUIMessages(messages.results ?? []).map((message) => {
             return (
               <Message
@@ -120,6 +135,13 @@ export const WidgetChatScreen = () => {
                 <MessageContent>
                   <Response>{message.text}</Response>
                 </MessageContent>
+                {message.role === "assistant" && (
+                  <DicebearAvatar
+                    imageUrl="/logo.svg"
+                    seed="assistant"
+                    size={32}
+                  />
+                )}
               </Message>
             );
           })}
