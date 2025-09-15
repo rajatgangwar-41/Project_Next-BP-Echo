@@ -1,9 +1,53 @@
+import { generateText } from "ai";
+import { google } from "@ai-sdk/google";
 import { ConvexError, v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
-import { mutation, query } from "../_generated/server";
-import { components, internal } from "../_generated/api";
-import { supportAgent } from "../system/ai/agents/supportAgent";
+import { mutation, query, action } from "../_generated/server";
+import { components } from "../_generated/api";
 import { listMessages, saveMessage } from "@convex-dev/agent";
+
+export const enhanceResponse = action({
+  args: {
+    prompt: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) {
+      throw new ConvexError({
+        code: "UNAUTHORIZED",
+        message: "Identity not found",
+      });
+    }
+
+    const orgId = identity.orgId as string;
+
+    if (!orgId) {
+      throw new ConvexError({
+        code: "UNAUTHORIZED",
+        message: "Organization not found",
+      });
+    }
+
+    const response = await generateText({
+      model: google("gemini-2.5-flash"),
+      messages: [
+        {
+          role: "system",
+          content:
+            "Enhance the operator's message to be more professional, clear, and helpful while maintaining their intent and key information.",
+        },
+        {
+          role: "user",
+          content: args.prompt,
+        },
+      ],
+      temperature: 0,
+    });
+
+    return response.text;
+  },
+});
 
 export const create: ReturnType<typeof mutation> = mutation({
   args: {
@@ -11,16 +55,16 @@ export const create: ReturnType<typeof mutation> = mutation({
     conversationId: v.id("conversations"),
   },
   handler: async (ctx, args) => {
-    const indentity = await ctx.auth.getUserIdentity();
+    const identity = await ctx.auth.getUserIdentity();
 
-    if (!indentity) {
+    if (!identity) {
       throw new ConvexError({
         code: "UNAUTHORIZED",
         message: "Identity not found",
       });
     }
 
-    const orgId = indentity.orgId as string;
+    const orgId = identity.orgId as string;
 
     if (!orgId) {
       throw new ConvexError({
@@ -54,7 +98,7 @@ export const create: ReturnType<typeof mutation> = mutation({
 
     await saveMessage(ctx, components.agent, {
       threadId: conversation.threadId,
-      agentName: indentity.familyName,
+      // agentName: identity.familyName,
       message: {
         role: "assistant",
         content: args.prompt,
@@ -69,16 +113,16 @@ export const getMany = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    const indentity = await ctx.auth.getUserIdentity();
+    const identity = await ctx.auth.getUserIdentity();
 
-    if (!indentity) {
+    if (!identity) {
       throw new ConvexError({
         code: "UNAUTHORIZED",
         message: "Identity not found",
       });
     }
 
-    const orgId = indentity.orgId as string;
+    const orgId = identity.orgId as string;
 
     if (!orgId) {
       throw new ConvexError({

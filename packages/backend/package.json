@@ -21,7 +21,8 @@
     "@convex-dev/agent": "^0.2.7",
     "ai": "^5.0.44",
     "convex": "^1.26.2",
-    "convex-helpers": "^0.1.104"
+    "convex-helpers": "^0.1.104",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^20.19.9",
