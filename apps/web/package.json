@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack --port 3000",
+    "dev": "next dev --port 3000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.31.9",
+    "@convex-dev/agent": "^0.2.7",
+    "@hookform/resolvers": "^5.2.1",
     "@sentry/nextjs": "^10",
     "@workspace/backend": "workspace:*",
     "@workspace/math": "workspace:*",
@@ -25,7 +27,9 @@
     "next": "^15.4.5",
     "next-themes": "^0.4.6",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-hook-form": "^7.62.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^20.19.9",
