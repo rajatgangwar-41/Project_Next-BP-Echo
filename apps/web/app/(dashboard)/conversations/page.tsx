@@ -1,7 +1,8 @@
 import React from "react";
+import { ConversationsView } from "@/modules/dashboard/ui/views/conversations-view";
 
 const Conversations = () => {
-  return <div>Conversations</div>;
+  return <ConversationsView />;
 };
 
 export default Conversations;
