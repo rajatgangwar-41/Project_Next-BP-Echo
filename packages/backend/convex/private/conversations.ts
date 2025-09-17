@@ -166,7 +166,7 @@ export const getMany = query({
 
         const contactSession = await ctx.db.get(conversation.contactSessionId);
 
-        if (!contactSession || contactSession.expiresAt < Date.now()) {
+        if (!contactSession) {
           return null;
         }
 
