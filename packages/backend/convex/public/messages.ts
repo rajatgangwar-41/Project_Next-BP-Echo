@@ -6,6 +6,7 @@ import { supportAgent } from "../system/ai/agents/supportAgent";
 import { listMessages, saveMessage } from "@convex-dev/agent";
 import { resolveConversation } from "../system/ai/tools/resolveConversation";
 import { escalateConversation } from "../system/ai/tools/escalateConversation";
+import { search } from "../system/ai/tools/search";
 
 export const create: ReturnType<typeof action> = action({
   args: {
@@ -65,8 +66,9 @@ export const create: ReturnType<typeof action> = action({
         {
           prompt: args.prompt,
           tools: {
-            resolveConversation,
-            escalateConversation,
+            resolveConversationTool: resolveConversation,
+            escalateConversationTool: escalateConversation,
+            searchTool: search,
           },
         },
       );
