@@ -1,7 +1,8 @@
 import React from "react";
+import { VapiView } from "@/modules/plugins/ui/views/vapi-view";
 
 const VapiPlugin = () => {
-  return <div>VapiPlugin</div>;
+  return <VapiView />;
 };
 
 export default VapiPlugin;
