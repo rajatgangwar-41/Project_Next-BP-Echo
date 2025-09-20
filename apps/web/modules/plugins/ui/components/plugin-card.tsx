@@ -25,17 +25,15 @@ export const PluginCard = ({
 }: PluginCardProps) => {
   return (
     <div className="h-fit w-full rounded-lg border bg-background p-8">
-      <div className="h-fit w-full rounded-lg border bg-background p-8">
-        <div className="mb-6 flex items-center justify-center gap-6">
-          <div className="flex flex-col items-center">
-            <Image
-              alt={serviceName}
-              className="rounded object-contain"
-              height={40}
-              width={40}
-              src={serviceImage}
-            />
-          </div>
+      <div className="mb-6 flex items-center justify-center gap-6">
+        <div className="flex flex-col items-center">
+          <Image
+            alt={serviceName}
+            className="rounded object-contain"
+            height={40}
+            width={40}
+            src={serviceImage}
+          />
         </div>
 
         <div className="flex flex-col items-center gap-1">
@@ -53,7 +51,7 @@ export const PluginCard = ({
         </div>
       </div>
 
-      <div className="mb-6 text-center">
+      <div className="mb-6 text-center"> 
         <p className="text-lg">Connect your {serviceName} account</p>
       </div>
 
