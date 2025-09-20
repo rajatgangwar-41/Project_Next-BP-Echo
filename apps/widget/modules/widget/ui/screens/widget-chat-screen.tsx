@@ -11,6 +11,7 @@ import {
   contactSessionIdAtomFamily,
   conversationIdAtom,
   organizationIdAtom,
+  widgetSettingsAtom,
   screenAtom,
 } from "@/modules/widget/atoms/widget-atoms";
 import { WidgetHeader } from "@/modules/widget/ui/components/widget-header";
@@ -26,6 +27,10 @@ import {
 } from "@workspace/ui/components/ai-elements/message";
 import { Response } from "@workspace/ui/components/ai-elements/response";
 import {
+  Suggestions,
+  Suggestion,
+} from "@workspace/ui/components/ai-elements/suggestion";
+import {
   PromptInput,
   PromptInputSubmit,
   PromptInputTextarea,
@@ -36,6 +41,7 @@ import { Form, FormField } from "@workspace/ui/components/form";
 import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
 import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
 import { InfiniteScrollTrigger } from "@workspace/ui/components/infinite-scroll-trigger";
+import { useMemo } from "react";
 
 const formSchema = z.object({
   message: z.string().min(1, "Message is required"),
@@ -46,6 +52,7 @@ export const WidgetChatScreen = () => {
   const setConversationId = useSetAtom(conversationIdAtom);
   const conversationId = useAtomValue(conversationIdAtom);
   const organizationId = useAtomValue(organizationIdAtom);
+  const widgetSettings = useAtomValue(widgetSettingsAtom);
   const contactSessionId = useAtomValue(
     contactSessionIdAtomFamily(organizationId || ""),
   );
@@ -100,6 +107,18 @@ export const WidgetChatScreen = () => {
     });
   };
 
+  const suggestions = useMemo(() => {
+    if (!widgetSettings) {
+      return [];
+    }
+
+    return Object.keys(widgetSettings.defaultSuggestions).map((key) => {
+      return widgetSettings.defaultSuggestions[
+        key as keyof typeof widgetSettings.defaultSuggestions
+      ];
+    });
+  }, [widgetSettings]);
+
   const onBack = () => {
     setConversationId(null);
     setScreen("selection");
@@ -147,6 +166,30 @@ export const WidgetChatScreen = () => {
           })}
         </ConversationContent>
       </Conversation>
+      {toUIMessages(messages.results ?? [])?.length === 1 && (
+        <Suggestions className="flex w-full flex-col items-end p-2">
+          {suggestions.map((suggestion) => {
+            if (!suggestion) {
+              return null;
+            }
+
+            return (
+              <Suggestion
+                key={suggestion}
+                onClick={() => {
+                  form.setValue("message", suggestion, {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                    shouldTouch: true,
+                  });
+                  form.handleSubmit(onSubmit)();
+                }}
+                suggestion={suggestion}
+              />
+            );
+          })}
+        </Suggestions>
+      )}
       <Form {...form}>
         <PromptInput
           className="rounded-none border-x-0 border-b-0"
