@@ -1,17 +1,18 @@
 "use client";
 
 import React from "react";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { LoaderIcon } from "lucide-react";
 import {
   contactSessionIdAtomFamily,
   errorMessageAtom,
   loadingMessageAtom,
   organizationIdAtom,
+  widgetSettingsAtom,
   screenAtom,
 } from "@/modules/widget/atoms/widget-atoms";
 import { WidgetHeader } from "@/modules/widget/ui/components/widget-header";
-import { useAction, useMutation } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 
 type InitStep = "org" | "session" | "settings" | "vapi" | "done";
@@ -25,14 +26,15 @@ export const WidgetLoadingScreen = ({
   const [sessionValid, setSessionValid] = React.useState(false);
 
   const [loadingMessage, setLoadingMessage] = useAtom(loadingMessageAtom);
-  const [_, setOrganizationId] = useAtom(organizationIdAtom);
-  const [__, setErrorMessage] = useAtom(errorMessageAtom);
-  const [___, setScreen] = useAtom(screenAtom);
+  const setOrganizationId = useSetAtom(organizationIdAtom);
+  const setWidgetSettings = useSetAtom(widgetSettingsAtom);
+  const setErrorMessage = useSetAtom(errorMessageAtom);
+  const setScreen = useSetAtom(screenAtom);
   const [contactSessionId] = useAtom(
     contactSessionIdAtomFamily(organizationId || ""),
   );
 
-  // Validate Organization
+  // Step 1: Validate Organization
   const validateOrganization = useAction(api.public.organizations.validate);
 
   React.useEffect(() => {
@@ -75,7 +77,7 @@ export const WidgetLoadingScreen = ({
     validateOrganization,
   ]);
 
-  // Validate Session
+  // Step 2: Validate Session
   const validateContactSession = useMutation(
     api.public.contactSessions.validate,
   );
@@ -89,7 +91,7 @@ export const WidgetLoadingScreen = ({
 
     if (!contactSessionId) {
       setSessionValid(false);
-      setStep("done");
+      setStep("settings");
       return;
     }
 
@@ -100,11 +102,11 @@ export const WidgetLoadingScreen = ({
     })
       .then((result) => {
         setSessionValid(result.valid);
-        setStep("done");
+        setStep("settings");
       })
       .catch(() => {
         setSessionValid(false);
-        setStep("done");
+        setStep("settings");
       });
   }, [
     step,
@@ -114,6 +116,28 @@ export const WidgetLoadingScreen = ({
     setSessionValid,
     setStep,
   ]);
+
+  // Step 3: Load Widget Settings
+  const widgetSettings = useQuery(
+    api.public.widgetSettings.getByOrganizationId,
+    organizationId
+      ? {
+          organizationId,
+        }
+      : "skip",
+  );
+
+  React.useEffect(() => {
+    if (step !== "settings") {
+      return;
+    }
+    setLoadingMessage("Loading widget settings...");
+
+    if (widgetSettings !== undefined) {
+      setWidgetSettings(widgetSettings);
+      setStep("done");
+    }
+  }, [step, widgetSettings, setStep, setWidgetSettings, setLoadingMessage]);
 
   React.useEffect(() => {
     if (step !== "done") {
