@@ -1,7 +1,8 @@
 import React from "react";
+import {CustomizationView} from "@/modules/customization/ui/views/customization-view";
 
-const Files = () => {
-  return <div>Files</div>;
+const Customization = () => {
+  return <CustomizationView />;
 };
 
-export default Files;
+export default Customization;
