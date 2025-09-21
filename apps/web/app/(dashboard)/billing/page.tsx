@@ -1,7 +1,8 @@
 import React from "react";
+import { BillingView } from "@/modules/billing/ui/views/billing-view";
 
 const Billing = () => {
-  return <div>Billing</div>;
+  return <BillingView />;
 };
 
 export default Billing;
