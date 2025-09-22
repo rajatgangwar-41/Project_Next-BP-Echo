@@ -6,7 +6,7 @@ import {
   MessageDoc,
   saveMessage,
 } from "@convex-dev/agent";
-import { components } from "../_generated/api";
+import { components, internal } from "../_generated/api";
 import { mutation, query } from "../_generated/server";
 
 export const getMany = query({
@@ -112,6 +112,11 @@ export const create = mutation({
         message: "Invalid session",
       });
     }
+
+    // This refreshes the user's contact session if they are within the threshold
+    await ctx.runMutation(internal.system.contactSessions.refresh, {
+      contactSessionId: args.contactSessionId,
+    });
 
     const widgetSettings = await ctx.db
       .query("widgetSettings")

@@ -3,7 +3,7 @@ import { google } from "@ai-sdk/google";
 import { ConvexError, v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
 import { mutation, query, action } from "../_generated/server";
-import { components } from "../_generated/api";
+import { components, internal } from "../_generated/api";
 import { listMessages, saveMessage } from "@convex-dev/agent";
 import { OPERATOR_MESSAGE_ENHANCEMENT_PROMPT } from "../system/ai/constants";
 
@@ -27,6 +27,20 @@ export const enhanceResponse = action({
       throw new ConvexError({
         code: "UNAUTHORIZED",
         message: "Organization not found",
+      });
+    }
+
+    const subscription = await ctx.runQuery(
+      internal.system.subscriptions.getByOrganizationId,
+      {
+        organizationId: orgId,
+      },
+    );
+
+    if (subscription?.status !== "active") {
+      throw new ConvexError({
+        code: "BAD_REQUEST",
+        message: "Missing subscription",
       });
     }
 
