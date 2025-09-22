@@ -1,6 +1,7 @@
 "use client";
 
 import { z } from "zod";
+import { toast } from "sonner";
 import { api } from "@workspace/backend/_generated/api";
 import { Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
@@ -80,6 +81,7 @@ export const ConversationIdView = ({
       const response = await enhanceResponse({ prompt: currentValue });
       form.setValue("message", response);
     } catch (error) {
+      toast.error("Something went wrong");
       console.error(error);
     } finally {
       setIsEnhancing(false);
