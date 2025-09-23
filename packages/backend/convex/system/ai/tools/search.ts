@@ -53,13 +53,19 @@ export const search = createTool({
       ],
     });
 
-    await saveMessage(ctx, components.agent, {
-      threadId: ctx.threadId,
-      message: {
-        role: "assistant",
-        content: response.text,
-      },
-    });
+    // await saveMessage(ctx, components.agent, {
+    //   threadId: ctx.threadId,
+    //   message: {
+    //     role: "assistant",
+    //     content: response.text,
+    //   },
+    // });
+
+    // Validate response
+    if (!response.text || response.text.trim().length === 0) {
+      console.warn("⚠️ Generated response is empty");
+      return `I found some information about "${args.query}" but couldn't generate a proper response. Please try rephrasing your question.`;
+    }
 
     return response.text;
   },

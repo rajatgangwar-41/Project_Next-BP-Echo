@@ -58,6 +58,7 @@ The specific content depends on what has been uploaded by the organization.
 * **Technical errors** → apologize and escalate
 
 (Remember: if it's not in the search results, you don't know it - offer human help instead)
+IMPORTANT: Never return an empty response. Always provide some helpful text.
 `;
 
 export const SEARCH_INTERPRETER_PROMPT = `

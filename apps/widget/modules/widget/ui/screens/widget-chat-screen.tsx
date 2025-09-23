@@ -1,6 +1,7 @@
 "use client";
 
 import z from "zod";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAtomValue, useSetAtom } from "jotai";
@@ -41,7 +42,6 @@ import { Form, FormField } from "@workspace/ui/components/form";
 import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
 import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
 import { InfiniteScrollTrigger } from "@workspace/ui/components/infinite-scroll-trigger";
-import { useMemo } from "react";
 
 const formSchema = z.object({
   message: z.string().min(1, "Message is required"),
@@ -93,18 +93,29 @@ export const WidgetChatScreen = () => {
   });
 
   const createMessage = useAction(api.public.messages.create);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (!conversation || !contactSessionId) {
+    if (!conversation || !contactSessionId || isSubmitting) {
       return;
     }
 
-    form.reset();
+    setIsSubmitting(true);
 
-    await createMessage({
-      threadId: conversation.threadId,
-      prompt: values.message,
-      contactSessionId,
-    });
+    try {
+      await createMessage({
+        threadId: conversation.threadId,
+        prompt: values.message,
+        contactSessionId,
+      });
+
+      form.reset();
+    } catch (error) {
+      console.error("Failed to send message:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const suggestions = useMemo(() => {
@@ -152,7 +163,10 @@ export const WidgetChatScreen = () => {
                 key={message.key}
               >
                 <MessageContent>
-                  <Response>{message.text}</Response>
+                  <Response>
+                    {message.text ??
+                      "I apologize, but I'm having trouble processing your request right now. Could you please try again or rephrase your question? If the issue persists, I can connect you with a human support agent."}
+                  </Response>
                 </MessageContent>
                 {message.role === "assistant" && (
                   <DicebearAvatar
@@ -222,9 +236,11 @@ export const WidgetChatScreen = () => {
             <PromptInputTools />
             <PromptInputSubmit
               disabled={
-                conversation?.status === "resolved" || !form.formState.isValid
+                conversation?.status === "resolved" ||
+                !form.formState.isValid ||
+                isSubmitting
               }
-              status="ready"
+              status={isSubmitting ? "streaming" : "ready"}
               type="submit"
             />
           </PromptInputToolbar>
